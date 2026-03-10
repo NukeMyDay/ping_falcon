@@ -310,7 +310,7 @@ const App = {
             <span class="status-label ${statusKey}">${STATUS_LABELS[statusKey] || statusKey}</span>
           </div>
           <div class="status-meta">${esc(description)}</div>
-          ${updatedAt ? `<div class="status-meta">Updated ${timeAgo(updatedAt)}</div>` : ''}
+          ${updatedAt ? `<div class="status-meta" data-timestamp="${updatedAt}">Updated ${timeAgo(updatedAt)}</div>` : ''}
           ${svc.statusPageUrl ? `<a class="status-link" href="${esc(svc.statusPageUrl)}" target="_blank" rel="noopener">Status Page &nearr;</a>` : ''}
         </div>
       `;
@@ -370,7 +370,12 @@ const App = {
     }, 60000);
 
     // Update "time ago" labels every 10s
-    setInterval(() => this.updateRefreshInfo(), 10000);
+    setInterval(() => {
+      this.updateRefreshInfo();
+      document.querySelectorAll('[data-timestamp]').forEach((el) => {
+        el.textContent = `Updated ${timeAgo(el.dataset.timestamp)}`;
+      });
+    }, 10000);
   },
 
   // --- Helpers ---
