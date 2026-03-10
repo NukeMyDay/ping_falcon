@@ -369,13 +369,13 @@ const App = {
       this.updateRefreshInfo();
     }, 60000);
 
-    // Update "time ago" labels every 10s
+    // Update "time ago" labels every second
     setInterval(() => {
       this.updateRefreshInfo();
       document.querySelectorAll('[data-timestamp]').forEach((el) => {
         el.textContent = `Updated ${timeAgo(el.dataset.timestamp)}`;
       });
-    }, 10000);
+    }, 1000);
   },
 
   // --- Helpers ---
