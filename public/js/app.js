@@ -101,9 +101,11 @@ const App = {
       chip.dataset.name = svc.name.toLowerCase();
       chip.dataset.category = (svc.category || '').toLowerCase();
 
+      const logoUrl = this.getLogoUrl(svc.statusPageUrl);
       chip.innerHTML = `
         <div class="chip-avatar" style="background:${svc.color}">
-          ${svc.name.charAt(0)}
+          ${logoUrl ? `<img src="${logoUrl}" alt="" class="chip-logo" onerror="this.style.display='none'">` : ''}
+          <span>${svc.name.charAt(0)}</span>
         </div>
         <div class="chip-info">
           <span class="chip-name">${esc(svc.name)}</span>
@@ -290,11 +292,13 @@ const App = {
       card.className = 'status-card';
 
       // Main body
+      const logoUrl = this.getLogoUrl(svc.statusPageUrl);
       card.innerHTML = `
         <div class="status-card-body">
           <div class="status-card-header">
             <div class="chip-avatar" style="background:${svc.color};width:28px;height:28px;font-size:0.75rem;">
-              ${svc.name.charAt(0)}
+              ${logoUrl ? `<img src="${logoUrl}" alt="" class="chip-logo" onerror="this.style.display='none'">` : ''}
+              <span>${svc.name.charAt(0)}</span>
             </div>
             <span class="status-card-name">${esc(svc.name)}</span>
           </div>
@@ -364,6 +368,19 @@ const App = {
 
     // Update "time ago" labels every 10s
     setInterval(() => this.updateRefreshInfo(), 10000);
+  },
+
+  // --- Helpers ---
+
+  getLogoUrl(statusPageUrl) {
+    try {
+      const { hostname } = new URL(statusPageUrl);
+      const parts = hostname.split('.');
+      const domain = parts.length > 2 ? parts.slice(-2).join('.') : hostname;
+      return `https://logo.clearbit.com/${domain}`;
+    } catch {
+      return null;
+    }
   },
 
   // --- Suggestions ---

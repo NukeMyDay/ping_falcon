@@ -7,6 +7,16 @@ services:
       - "3001:3000"
     volumes:
       - ./data:/app/data
+      - ./public:/app/public
+      - ./services:/app/services
+      - ./routes:/app/routes
+      - ./server.js:/app/server.js
     environment:
       - NODE_ENV=production
       - PORT=3000
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.pingfalcon.rule=Host(`pingfalcon.net`) || Host(`www.pingfalcon.net`)"
+      - traefik.http.routers.pingfalcon.entrypoints=websecure
+      - traefik.http.routers.pingfalcon.tls.certresolver=letsencrypt
+      - traefik.http.services.pingfalcon.loadbalancer.server.port=3000
