@@ -319,23 +319,39 @@ body {
   border-radius: inherit;
 }
 
-.chip-info {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
 .chip-name {
   font-weight: 500;
   font-size: 0.9rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
 }
 
-.chip-category {
-  font-size: 0.75rem;
+.section-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.section-title-row .section-title {
+  margin-bottom: 0;
+}
+
+.deselect-all-btn {
+  background: none;
+  border: none;
   color: var(--text-secondary);
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.deselect-all-btn:hover {
+  color: var(--text);
 }
 
 /* --- Status summary bar --- */

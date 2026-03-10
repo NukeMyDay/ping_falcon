@@ -76,6 +76,10 @@ const App = {
     document.getElementById('refresh-btn').addEventListener('click', () => {
       this.fetchStatuses();
     });
+
+    document.getElementById('deselect-all').addEventListener('click', () => {
+      this.deselectAll();
+    });
   },
 
   // --- Services ---
@@ -110,16 +114,14 @@ const App = {
           ${logoUrl ? `<img src="${logoUrl}" alt="" class="chip-logo" onerror="this.style.display='none'">` : ''}
           <span>${svc.name.charAt(0)}</span>
         </div>
-        <div class="chip-info">
-          <span class="chip-name">${esc(svc.name)}</span>
-          <span class="chip-category">${esc(svc.category || '')}</span>
-        </div>
+        <span class="chip-name">${esc(svc.name)}</span>
       `;
 
       chip.addEventListener('click', () => this.toggleService(svc.id, chip));
       container.appendChild(chip);
     }
 
+    this.updateDeselectBtn();
     this._setupServiceListToggle();
   },
 
@@ -184,8 +186,22 @@ const App = {
       this.state.selected.add(id);
       chip.classList.add('active');
     }
+    this.updateDeselectBtn();
     this.updateUrl();
     this.fetchStatuses();
+  },
+
+  deselectAll() {
+    this.state.selected.clear();
+    document.querySelectorAll('.service-chip.active').forEach((c) => c.classList.remove('active'));
+    this.updateDeselectBtn();
+    this.updateUrl();
+    this.fetchStatuses();
+  },
+
+  updateDeselectBtn() {
+    const btn = document.getElementById('deselect-all');
+    if (btn) btn.style.display = this.state.selected.size > 0 ? '' : 'none';
   },
 
   filterServices(query) {
