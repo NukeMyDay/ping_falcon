@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pingfalcon — Service Status Monitor</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <!-- Apply theme before render to avoid flash -->
+  <script>
+    if (localStorage.getItem('theme') !== 'light') {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-inner">
+        <div class="logo">
+          <span class="logo-text">pingfalcon</span>
+        </div>
+        <p class="tagline">Monitor the services you rely on.</p>
+        <div class="header-controls">
+          <div class="region-selector" title="Filter incidents by region">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="region-icon">
+              <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+            <select id="region-select">
+              <option value="eu">EU / DACH</option>
+              <option value="us">US / Americas</option>
+              <option value="apac">APAC</option>
+              <option value="global">Global (alle)</option>
+            </select>
+          </div>
+          <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
+            <span id="theme-label">Light mode</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Service Selector -->
+    <section class="section" id="selector-section">
+      <h2 class="section-title">Services</h2>
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <input
+          type="text"
+          id="service-search"
+          class="search-input"
+          placeholder="Search services..."
+          autocomplete="off"
+        />
+      </div>
+      <div class="service-grid" id="service-list">
+        <!-- filled by JS -->
+      </div>
+    </section>
+
+    <!-- Status Dashboard -->
+    <section class="section" id="status-section" style="display:none">
+      <div class="section-header">
+        <h2 class="section-title">Status</h2>
+        <div class="refresh-row">
+          <span class="refresh-info" id="refresh-info"></span>
+          <button class="refresh-btn" id="refresh-btn" title="Refresh status">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+              <polyline points="21 3 21 9 15 9"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div id="status-summary" class="status-summary" style="display:none"></div>
+      <div class="status-grid" id="status-grid">
+        <!-- filled by JS -->
+      </div>
+    </section>
+
+    <!-- Two-column layout for Suggestions & Webhooks -->
+    <div class="two-col">
+      <!-- Suggestions -->
+      <section class="section" id="suggest-section">
+        <h2 class="section-title">Suggest a Tool</h2>
+        <form id="suggest-form" class="suggest-form">
+          <input
+            type="text"
+            id="suggest-name"
+            class="input"
+            placeholder="Service name (e.g. Notion)"
+            required
+            minlength="2"
+            maxlength="60"
+          />
+          <input
+            type="url"
+            id="suggest-url"
+            class="input"
+            placeholder="Status page URL (optional)"
+          />
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        <p class="form-hint" id="suggest-msg"></p>
+
+        <div class="suggestions-list" id="suggestions-list">
+          <!-- filled by JS -->
+        </div>
+      </section>
+
+      <!-- Webhook API -->
+      <section class="section" id="webhook-section">
+        <h2 class="section-title">Webhook API</h2>
+        <p class="text-secondary">
+          Subscribe to status changes via webhook.
+          We POST to your URL when a service status changes.
+        </p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <div class="code-label">Subscribe</div>
+            <button class="copy-btn" title="Copy to clipboard" onclick="copyCode(this)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+          <div class="code-block-body"><pre><code>POST /api/webhooks
+Content-Type: application/json
+
+{
+  "url": "https://your-server.com/hook",
+  "services": ["shopify", "slack"],
+  "secret": "your-optional-secret"
+}</code></pre></div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <div class="code-label">Payload you receive</div>
+            <button class="copy-btn" title="Copy to clipboard" onclick="copyCode(this)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+          <div class="code-block-body"><pre><code>{
+  "event": "status_change",
+  "service": "shopify",
+  "previous_status": "operational",
+  "current_status": "major_outage",
+  "description": "...",
+  "timestamp": "2025-01-15T10:30:00Z"
+}</code></pre></div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <div class="code-label">Verify signature</div>
+            <button class="copy-btn" title="Copy to clipboard" onclick="copyCode(this)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+          <div class="code-block-body"><pre><code>X-Pingfalcon-Signature: HMAC-SHA256(secret, body)</code></pre></div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <div class="code-label">Unsubscribe</div>
+            <button class="copy-btn" title="Copy to clipboard" onclick="copyCode(this)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+          <div class="code-block-body"><pre><code>DELETE /api/webhooks/:id
+Content-Type: application/json
+
+{ "secret": "your-secret" }</code></pre></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p class="footer-main">
+        pingfalcon &mdash; Free &amp; Open Source.
+        <a href="https://github.com/NukeMyDay/pingfalcon" target="_blank" rel="noopener" class="footer-link">View on GitHub</a>
+      </p>
+      <p class="footer-impressum">
+        Angaben gem. §5 TMG: Florian zu Dreele &middot; Brabanter Str. 31 &middot; 50672 K&ouml;ln &middot;
+        <a href="mailto:tweet@pingfalcon.net" class="footer-link">tweet@pingfalcon.net</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
