@@ -1,0 +1,12 @@
+services:
+  pingfalcon:
+    build: .
+    container_name: pingfalcon
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
