@@ -94,6 +94,9 @@ const App = {
     const container = document.getElementById('service-list');
     container.innerHTML = '';
 
+    const countEl = document.getElementById('service-count');
+    if (countEl) countEl.textContent = this.state.services.length;
+
     for (const svc of this.state.services) {
       const chip = document.createElement('div');
       chip.className = `service-chip${this.state.selected.has(svc.id) ? ' active' : ''}`;
