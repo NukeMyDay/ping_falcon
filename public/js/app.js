@@ -468,7 +468,6 @@ const App = {
       item.innerHTML = `
         <div>
           <div class="suggestion-name">${esc(s.name)}</div>
-          ${s.url ? `<div class="suggestion-url">${esc(s.url)}</div>` : ''}
         </div>
         <div class="suggestion-right">
           <span class="vote-count">${s.votes}</span>
@@ -486,11 +485,9 @@ const App = {
 
   async submitSuggestion() {
     const nameEl = document.getElementById('suggest-name');
-    const urlEl = document.getElementById('suggest-url');
     const msgEl = document.getElementById('suggest-msg');
 
     const name = nameEl.value.trim();
-    const url = urlEl.value.trim();
 
     if (!name) return;
 
@@ -498,7 +495,7 @@ const App = {
       const res = await fetch('/api/suggestions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, url: url || undefined }),
+        body: JSON.stringify({ name }),
       });
 
       const data = await res.json();
@@ -506,7 +503,6 @@ const App = {
         msgEl.textContent = data.message;
         msgEl.className = 'form-hint success';
         nameEl.value = '';
-        urlEl.value = '';
         this.fetchSuggestions();
       } else {
         msgEl.textContent = data.error || 'Something went wrong.';

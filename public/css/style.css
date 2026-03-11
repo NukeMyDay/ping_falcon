@@ -142,6 +142,17 @@ body {
   min-width: 0;
 }
 
+.right-col-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.right-col-stack > .section {
+  margin-bottom: 0;
+}
+
 @media (max-width: 700px) {
   .two-col {
     grid-template-columns: 1fr;
@@ -747,7 +758,6 @@ body {
 .form-hint {
   font-size: 0.82rem;
   color: var(--text-secondary);
-  min-height: 1.4em;
 }
 
 .form-hint.success {
@@ -761,7 +771,7 @@ body {
 /* --- Suggestions list --- */
 
 .suggestions-list {
-  margin-top: 16px;
+  margin-top: 8px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -820,6 +830,10 @@ body {
   margin-bottom: 12px;
   font-size: 0.82rem;
   line-height: 1.5;
+}
+
+.code-block:last-child {
+  margin-bottom: 0;
 }
 
 .code-block-header {
@@ -883,7 +897,7 @@ body {
 
 /* --- Changelog --- */
 
-.changelog-section { padding-bottom: 8px; }
+.changelog-section { padding-bottom: 24px; }
 
 .changelog-list {
   display: flex;

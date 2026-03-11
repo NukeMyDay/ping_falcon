@@ -97,12 +97,6 @@
             minlength="2"
             maxlength="60"
           />
-          <input
-            type="url"
-            id="suggest-url"
-            class="input"
-            placeholder="Status page URL (optional)"
-          />
           <button type="submit" class="btn btn-primary">Submit</button>
         </form>
         <p class="form-hint" id="suggest-msg"></p>
@@ -112,7 +106,8 @@
         </div>
       </section>
 
-      <!-- Webhook API -->
+      <!-- Right column: Webhook API + Changelog -->
+      <div class="right-col-stack">
       <section class="section" id="webhook-section">
         <h2 class="section-title">Webhook API</h2>
         <p class="text-secondary">
@@ -183,7 +178,8 @@ Content-Type: application/json
           <span class="changelog-loading">Loading...</span>
         </div>
       </section>
-    </div>
+      </div><!-- /right-col-stack -->
+    </div><!-- /two-col -->
   </main>
 
   <footer class="footer">
