@@ -64,6 +64,9 @@ async function parseStatuspage(service) {
   const res = await fetch(summaryUrl, { signal: AbortSignal.timeout(15000) });
   if (!res.ok) return { rawIndicator: 'none', allIncidents: [], status: 'unknown', description: `HTTP ${res.status}` };
 
+  const ct = res.headers.get('content-type') || '';
+  if (!ct.includes('json')) return { rawIndicator: 'none', allIncidents: [], status: 'unknown', description: 'No data' };
+
   const data = await res.json();
   const rawIndicator = data.status?.indicator || 'none';
 

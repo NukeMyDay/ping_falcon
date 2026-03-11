@@ -123,7 +123,7 @@ const App = {
       chip.dataset.name = svc.name.toLowerCase();
       chip.dataset.category = (svc.category || '').toLowerCase();
 
-      const logoUrl = this.getLogoUrl(svc.statusPageUrl);
+      const logoUrl = this.getLogoUrl(svc.logoDomain || svc.statusPageUrl);
       chip.innerHTML = `
         <div class="chip-avatar" style="background:${svc.color}">
           ${logoUrl ? `<img src="${logoUrl}" alt="" class="chip-logo" onerror="this.style.display='none'">` : ''}
@@ -172,14 +172,9 @@ const App = {
       btn.id = 'service-list-toggle';
       btn.className = 'service-list-toggle';
 
-      const chevronDown = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" class="toggle-chevron"><path d="M3 6l5 5 5-5"/></svg>`;
-      const chevronUp   = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" class="toggle-chevron"><path d="M13 10l-5-5-5 5"/></svg>`;
-
       let collapsed = true;
       const render = () => {
-        btn.innerHTML = collapsed
-          ? `Show all <span class="toggle-count">${total}</span>${chevronDown}`
-          : `Show less ${chevronUp}`;
+        btn.textContent = collapsed ? 'Show all' : 'Show less';
       };
       render();
 
@@ -189,7 +184,9 @@ const App = {
         render();
       });
 
-      container.after(btn);
+      const titleActions = document.querySelector('.title-actions');
+      const deselectBtn = document.getElementById('deselect-all');
+      titleActions.insertBefore(btn, deselectBtn);
     });
   },
 
@@ -320,7 +317,7 @@ const App = {
       card.className = 'status-card';
 
       // Main body
-      const logoUrl = this.getLogoUrl(svc.statusPageUrl);
+      const logoUrl = this.getLogoUrl(svc.logoDomain || svc.statusPageUrl);
       card.innerHTML = `
         <div class="status-card-body">
           <div class="status-card-header">

@@ -246,11 +246,12 @@ body {
 }
 
 .service-list-toggle {
-  margin-top: 10px;
   background: none;
   border: none;
-  color: var(--accent);
-  font-size: 0.83rem;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
   cursor: pointer;
   padding: 0;
   display: inline-flex;
@@ -259,7 +260,7 @@ body {
 }
 
 .service-list-toggle:hover {
-  color: var(--accent-hover);
+  color: var(--text);
 }
 
 .toggle-chevron {
@@ -777,20 +778,23 @@ body {
 /* --- Suggestions list --- */
 
 .suggestions-list {
-  margin-top: 8px;
+  margin-top: 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  border-top: 1px solid var(--border);
 }
 
 .suggestion-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 14px;
-  background: var(--bg-input);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
+  padding: 9px 2px;
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
 }
 
 .suggestion-name {
