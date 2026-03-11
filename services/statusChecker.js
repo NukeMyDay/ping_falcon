@@ -61,7 +61,7 @@ function shapeIncident(i) {
 
 async function parseStatuspage(service) {
   const summaryUrl = service.apiUrl.replace('/status.json', '/summary.json');
-  const res = await fetch(summaryUrl, { signal: AbortSignal.timeout(10000) });
+  const res = await fetch(summaryUrl, { signal: AbortSignal.timeout(15000) });
   if (!res.ok) return { rawIndicator: 'none', allIncidents: [], status: 'unknown', description: `HTTP ${res.status}` };
 
   const data = await res.json();
@@ -94,7 +94,7 @@ async function parseStatuspage(service) {
 }
 
 async function parseSlack(service) {
-  const res = await fetch(service.apiUrl, { signal: AbortSignal.timeout(10000) });
+  const res = await fetch(service.apiUrl, { signal: AbortSignal.timeout(15000) });
   if (!res.ok) return { rawIndicator: 'none', allIncidents: [], status: 'unknown', description: `HTTP ${res.status}`, incidents: [] };
   const data = await res.json();
 
@@ -123,7 +123,7 @@ async function parseSlack(service) {
 
 async function parseGoogleCloud(service) {
   try {
-    const res = await fetch(service.apiUrl, { signal: AbortSignal.timeout(10000) });
+    const res = await fetch(service.apiUrl, { signal: AbortSignal.timeout(15000) });
     if (!res.ok) return { rawIndicator: 'none', allIncidents: [], status: 'unknown', description: `HTTP ${res.status}`, incidents: [] };
     const raw = await res.json();
     if (!Array.isArray(raw)) return { rawIndicator: 'none', allIncidents: [], status: 'unknown', description: 'Unexpected format', incidents: [] };
@@ -170,22 +170,27 @@ async function checkService(service) {
 
 async function checkAllStatuses() {
   const services = getFullRegistry();
-  await Promise.allSettled(
-    services.map(async (service) => {
-      const result = await checkService(service);
-      const now = new Date().toISOString();
-      const previous = statusCache[service.id];
-      const statusChanged = previous && previous.status !== result.status;
+  const BATCH_SIZE = 10;
 
-      statusCache[service.id] = { ...result, updatedAt: now };
+  for (let i = 0; i < services.length; i += BATCH_SIZE) {
+    const batch = services.slice(i, i + BATCH_SIZE);
+    await Promise.allSettled(
+      batch.map(async (service) => {
+        const result = await checkService(service);
+        const now = new Date().toISOString();
+        const previous = statusCache[service.id];
+        const statusChanged = previous && previous.status !== result.status;
 
-      try {
-        getDb().prepare('INSERT INTO status_log (service_id, status, description) VALUES (?, ?, ?)').run(service.id, result.status, result.description);
-      } catch { /* ignore */ }
+        statusCache[service.id] = { ...result, updatedAt: now };
 
-      if (statusChanged) notifyStatusChange(service.id, previous.status, result.status, result.description);
-    })
-  );
+        try {
+          getDb().prepare('INSERT INTO status_log (service_id, status, description) VALUES (?, ?, ?)').run(service.id, result.status, result.description);
+        } catch { /* ignore */ }
+
+        if (statusChanged) notifyStatusChange(service.id, previous.status, result.status, result.description);
+      })
+    );
+  }
 
   const entries = Object.entries(statusCache);
   console.log(`[${new Date().toISOString()}] Status check: ${entries.map(([id, s]) => `${id}=${s.status}`).join(', ')}`);

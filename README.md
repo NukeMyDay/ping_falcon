@@ -2,14 +2,15 @@
 
 **A lightweight, self-hostable status monitor for the tools your business depends on.**
 
-Monitor 30+ SaaS services in real time — from payments and e-commerce to communication and infrastructure. Select the services you care about, filter by region, and subscribe to webhook alerts when something breaks.
+Monitor 100 SaaS services in real time — from payments and e-commerce to communication and infrastructure. Select the services you care about, filter by region, and subscribe to webhook alerts when something breaks.
 
 ![pingfalcon screenshot](https://pingfalcon.net)
 
 ## Features
 
-- **30 pre-configured services** — Shopify, Stripe, Klaviyo, Slack, GitHub, Cloudflare, OpenAI, and more
+- **100 pre-configured services** — Shopify, Stripe, Klaviyo, Slack, GitHub, Cloudflare, OpenAI, Figma, Datadog, and more
 - **Real-time status** — polls official status APIs every 60 seconds
+- **Live timestamps** — "Updated X ago" counts up every second
 - **Region filtering** — EU/DACH, US/Americas, APAC, Global
 - **Webhook API** — receive POST notifications when a service status changes
 - **Dark/light mode** — auto-detects system preference
@@ -27,7 +28,7 @@ cd pingfalcon
 docker compose up -d
 ```
 
-The app will be available at `http://localhost:3001`.
+The app will be available at `http://localhost:3000`.
 
 ### Without Docker
 
@@ -109,18 +110,28 @@ Unsubscribe: `DELETE /api/webhooks/:id`
 
 | Service | Category |
 |---|---|
-| Shopify, Klaviyo, Recharge | E-Commerce |
-| Stripe, Adyen, Mollie | Payments |
+| Shopify, Klaviyo, Recharge, BigCommerce, Squarespace, Webflow | E-Commerce |
+| Stripe, Adyen, Plaid, Chargebee, Braintree | Payments |
 | Claude, OpenAI, Gemini | AI |
-| Slack, Zoom, Discord, Twilio | Communication |
-| Asana, Linear, Jira, Notion | Project Management |
-| HubSpot, Pipedrive | CRM |
-| Mailchimp, SendGrid | Email Marketing |
-| Zendesk, Intercom, Gorgias | Customer Support |
-| GitHub, Cloudflare | Infrastructure |
-| Vercel, Netlify | Hosting |
-| Mixpanel | Analytics |
-| Y42 | Data Platform |
+| Slack, Zoom, Discord, Twilio, Webex, RingCentral, Vonage, Telnyx, Pusher, Ably | Communication |
+| Asana, Linear, Jira, Notion, monday.com, Airtable, ClickUp, Trello, Confluence, Coda | Project Management |
+| Figma, Miro, Loom | Design |
+| HubSpot, Braze, ActiveCampaign | CRM |
+| Mailchimp, SendGrid, Mailgun, Brevo, Kit, Customer.io | Email Marketing |
+| Zendesk, Intercom, Gorgias, Help Scout, Drift, LiveChat | Customer Support |
+| GitHub, Cloudflare, DigitalOcean, Linode | Infrastructure |
+| Vercel, Netlify, Render, Fly.io | Hosting |
+| CircleCI, Buildkite | Developer Tools (CI/CD) |
+| Supabase, LaunchDarkly, npm, Snyk, HashiCorp, Algolia, Cloudinary, Stream | Developer Tools |
+| Datadog, New Relic, Sentry, Grafana Cloud | Monitoring |
+| 1Password, Duo Security | Security |
+| Snowflake, Segment, Fivetran, dbt Cloud, Stitch Data, Y42 | Data Platform |
+| Mixpanel, Amplitude, Hotjar, FullStory, Optimizely, Pendo | Analytics |
+| Calendly, Typeform, SurveyMonkey | Scheduling & Forms |
+| Buffer, Hootsuite, Sprout Social | Social Media |
+| Dropbox, Box | Storage |
+| Contentful, Sanity, Ghost | CMS |
+| Twitch | Streaming |
 
 ## Self-Hosting with Traefik
 
@@ -129,10 +140,16 @@ If you're running Traefik as a reverse proxy, add labels to `docker-compose.yml`
 ```yaml
 labels:
   - traefik.enable=true
-  - "traefik.http.routers.pingfalcon.rule=Host(`yourdomain.com`)"
+  - "traefik.http.routers.pingfalcon.rule=Host(`yourdomain.com`) || Host(`www.yourdomain.com`)"
   - traefik.http.routers.pingfalcon.entrypoints=websecure
   - traefik.http.routers.pingfalcon.tls.certresolver=letsencrypt
   - traefik.http.services.pingfalcon.loadbalancer.server.port=3000
+  # HTTP → HTTPS redirect
+  - "traefik.http.routers.pingfalcon-http.rule=Host(`yourdomain.com`) || Host(`www.yourdomain.com`)"
+  - traefik.http.routers.pingfalcon-http.entrypoints=web
+  - traefik.http.routers.pingfalcon-http.middlewares=redirect-to-https
+  - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+  - traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true
 ```
 
 ## Tech Stack

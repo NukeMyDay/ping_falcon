@@ -575,6 +575,15 @@ body {
 .status-dot.partial_outage { background: var(--status-partial); }
 .status-dot.major_outage { background: var(--status-major); }
 .status-dot.unknown { background: var(--status-unknown); }
+.status-dot.pending {
+  background: var(--text-secondary);
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.35; transform: scale(0.75); }
+}
 
 .status-label {
   font-size: 0.85rem;

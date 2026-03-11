@@ -8,6 +8,7 @@ const STATUS_LABELS = {
   partial_outage: 'Partial Outage',
   major_outage: 'Major Outage',
   unknown: 'Unknown',
+  pending: 'Checking...',
 };
 
 const App = {

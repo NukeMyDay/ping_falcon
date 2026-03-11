@@ -82,7 +82,10 @@ router.get('/status', (req, res) => {
   const result = {};
   for (const id of ids) {
     const cached = cache[id];
-    if (!cached) continue;
+    if (!cached) {
+      result[id] = { status: 'pending', description: 'Checking...', incidents: [], updatedAt: null };
+      continue;
+    }
 
     const allInc = cached.allIncidents || [];
 
