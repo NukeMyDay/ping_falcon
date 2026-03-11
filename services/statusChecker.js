@@ -61,7 +61,13 @@ function shapeIncident(i) {
 
 async function parseStatuspage(service) {
   const summaryUrl = service.apiUrl.replace('/status.json', '/summary.json');
-  const res = await fetch(summaryUrl, { signal: AbortSignal.timeout(15000) });
+  let res = await fetch(summaryUrl, { signal: AbortSignal.timeout(15000) });
+
+  // Some status pages don't serve summary.json — fall back to status.json
+  if (res.status === 404 && summaryUrl !== service.apiUrl) {
+    res = await fetch(service.apiUrl, { signal: AbortSignal.timeout(15000) });
+  }
+
   if (!res.ok) return { rawIndicator: 'none', allIncidents: [], status: 'unknown', description: `HTTP ${res.status}` };
 
   const ct = res.headers.get('content-type') || '';
