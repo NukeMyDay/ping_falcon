@@ -691,10 +691,16 @@ body {
 
 /* --- Suggestion form --- */
 
+.suggest-input {
+  flex: 1;
+  min-width: 160px;
+}
+
 .suggest-form {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .input {
