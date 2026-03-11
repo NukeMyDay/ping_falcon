@@ -339,6 +339,38 @@ body {
   margin-bottom: 0;
 }
 
+.sort-toggle {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  margin-left: auto;
+}
+
+.sort-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 3px 10px;
+  border-radius: 4px;
+  transition: all var(--transition);
+}
+
+.sort-btn.active {
+  background: var(--bg-card);
+  color: var(--text);
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.sort-btn:not(.active):hover {
+  color: var(--text);
+}
+
 .deselect-all-btn {
   background: none;
   border: none;
@@ -557,6 +589,27 @@ body {
   font-size: 0.95rem;
 }
 
+.report-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  opacity: 0;
+  transition: opacity var(--transition), color var(--transition), background var(--transition);
+  text-decoration: none;
+}
+
+.status-card:hover .report-btn { opacity: 1; }
+.report-btn:hover {
+  color: var(--text);
+  background: var(--bg-hover);
+}
+
 .status-indicator {
   display: flex;
   align-items: center;
@@ -612,48 +665,6 @@ body {
 
 .status-link:hover {
   text-decoration: underline;
-}
-
-.refresh-info {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-}
-
-.refresh-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.refresh-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: transparent;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-  flex-shrink: 0;
-}
-
-.refresh-btn:hover {
-  background: var(--bg-hover);
-  color: var(--text);
-  border-color: var(--text-secondary);
-}
-
-.refresh-btn svg {
-  width: 14px;
-  height: 14px;
-}
-
-.refresh-btn.loading svg {
-  animation: spin 0.7s linear infinite;
 }
 
 @keyframes spin {

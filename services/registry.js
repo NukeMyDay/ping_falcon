@@ -25,6 +25,7 @@ const services = [
     id: 'shopify',
     name: 'Shopify',
     category: 'E-Commerce',
+    popular: true,
     color: '#96bf48',
     statusPageUrl: 'https://status.shopify.com',
     apiUrl: 'https://status.shopify.com/api/v2/status.json',
@@ -79,20 +80,12 @@ const services = [
   // --- Payments ---
   {
     id: 'stripe',
+    popular: true,
     name: 'Stripe',
     category: 'Payments',
     color: '#6772e5',
     statusPageUrl: 'https://status.stripe.com',
     apiUrl: 'https://status.stripe.com/api/v2/status.json',
-    type: 'statuspage',
-  },
-  {
-    id: 'adyen',
-    name: 'Adyen',
-    category: 'Payments',
-    color: '#0abf53',
-    statusPageUrl: 'https://status.adyen.com',
-    apiUrl: 'https://status.adyen.com/api/v2/status.json',
     type: 'statuspage',
   },
   {
@@ -126,6 +119,7 @@ const services = [
   // --- AI ---
   {
     id: 'claude',
+    popular: true,
     name: 'Claude',
     category: 'AI',
     color: '#d97757',
@@ -135,6 +129,7 @@ const services = [
   },
   {
     id: 'openai',
+    popular: true,
     name: 'OpenAI',
     category: 'AI',
     color: '#10a37f',
@@ -155,6 +150,7 @@ const services = [
   // --- Communication ---
   {
     id: 'slack',
+    popular: true,
     name: 'Slack',
     category: 'Communication',
     color: '#611f69',
@@ -164,6 +160,7 @@ const services = [
   },
   {
     id: 'zoom',
+    popular: true,
     name: 'Zoom',
     category: 'Communication',
     color: '#2d8cff',
@@ -173,6 +170,7 @@ const services = [
   },
   {
     id: 'discord',
+    popular: true,
     name: 'Discord',
     category: 'Communication',
     color: '#7289da',
@@ -182,6 +180,7 @@ const services = [
   },
   {
     id: 'twilio',
+    popular: true,
     name: 'Twilio',
     category: 'Communication',
     color: '#f22f46',
@@ -247,6 +246,7 @@ const services = [
   // --- Project Management ---
   {
     id: 'asana',
+    popular: true,
     name: 'Asana',
     category: 'Project Management',
     color: '#f06a6a',
@@ -257,6 +257,7 @@ const services = [
   },
   {
     id: 'linear',
+    popular: true,
     name: 'Linear',
     category: 'Project Management',
     color: '#5e6ad2',
@@ -266,6 +267,7 @@ const services = [
   },
   {
     id: 'jira',
+    popular: true,
     name: 'Jira',
     category: 'Project Management',
     color: '#0052cc',
@@ -275,6 +277,7 @@ const services = [
   },
   {
     id: 'notion',
+    popular: true,
     name: 'Notion',
     category: 'Productivity',
     color: '#191919',
@@ -293,6 +296,7 @@ const services = [
   },
   {
     id: 'airtable',
+    popular: true,
     name: 'Airtable',
     category: 'Project Management',
     color: '#fcb400',
@@ -340,6 +344,7 @@ const services = [
   // --- Design & Collaboration ---
   {
     id: 'figma',
+    popular: true,
     name: 'Figma',
     category: 'Design',
     color: '#f24e1e',
@@ -369,6 +374,7 @@ const services = [
   // --- CRM & Marketing ---
   {
     id: 'hubspot',
+    popular: true,
     name: 'HubSpot',
     category: 'CRM',
     color: '#ff7a59',
@@ -398,6 +404,7 @@ const services = [
   // --- Email Marketing ---
   {
     id: 'mailchimp',
+    popular: true,
     name: 'Mailchimp',
     category: 'Email Marketing',
     color: '#ffe01b',
@@ -407,6 +414,7 @@ const services = [
   },
   {
     id: 'sendgrid',
+    popular: true,
     name: 'SendGrid',
     category: 'Email Marketing',
     color: '#1a82e2',
@@ -454,6 +462,7 @@ const services = [
   // --- Customer Support ---
   {
     id: 'zendesk',
+    popular: true,
     name: 'Zendesk',
     category: 'Customer Support',
     color: '#1f73b7',
@@ -463,6 +472,7 @@ const services = [
   },
   {
     id: 'intercom',
+    popular: true,
     name: 'Intercom',
     category: 'Customer Support',
     color: '#286efa',
@@ -510,6 +520,7 @@ const services = [
   // --- Infrastructure ---
   {
     id: 'github',
+    popular: true,
     name: 'GitHub',
     category: 'Infrastructure',
     color: '#24292e',
@@ -519,6 +530,7 @@ const services = [
   },
   {
     id: 'cloudflare',
+    popular: true,
     name: 'Cloudflare',
     category: 'Infrastructure',
     color: '#f38020',
@@ -548,6 +560,7 @@ const services = [
   // --- Hosting ---
   {
     id: 'vercel',
+    popular: true,
     name: 'Vercel',
     category: 'Hosting',
     color: '#000000',
@@ -557,6 +570,7 @@ const services = [
   },
   {
     id: 'netlify',
+    popular: true,
     name: 'Netlify',
     category: 'Hosting',
     color: '#00c7b7',
@@ -678,6 +692,7 @@ const services = [
   // --- Monitoring & Observability ---
   {
     id: 'datadog',
+    popular: true,
     name: 'Datadog',
     category: 'Monitoring',
     color: '#632ca6',
@@ -696,6 +711,7 @@ const services = [
   },
   {
     id: 'sentry',
+    popular: true,
     name: 'Sentry',
     category: 'Monitoring',
     color: '#362d59',
@@ -947,8 +963,8 @@ const services = [
     name: 'Ghost',
     category: 'CMS',
     color: '#15171a',
-    statusPageUrl: 'https://status.ghost.org',
-    apiUrl: 'https://status.ghost.org/api/v2/status.json',
+    statusPageUrl: 'https://ghoststatus.org',
+    apiUrl: 'https://ghoststatus.org/api/v2/status.json',
     type: 'statuspage',
   },
 

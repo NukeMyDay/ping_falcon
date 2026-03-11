@@ -18,7 +18,7 @@ const App = {
     statuses: {},
     suggestions: [],
     region: 'eu',
-    lastFetch: null,
+    sort: 'popular',
     refreshTimer: null,
   },
 
@@ -74,12 +74,17 @@ const App = {
       this.fetchStatuses();
     });
 
-    document.getElementById('refresh-btn').addEventListener('click', () => {
-      this.fetchStatuses();
-    });
-
     document.getElementById('deselect-all').addEventListener('click', () => {
       this.deselectAll();
+    });
+
+    document.querySelectorAll('.sort-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.state.sort = btn.dataset.sort;
+        document.querySelectorAll('.sort-btn').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.renderServiceList();
+      });
     });
   },
 
@@ -102,7 +107,15 @@ const App = {
     const countEl = document.getElementById('service-count');
     if (countEl) countEl.textContent = this.state.services.length;
 
-    for (const svc of this.state.services) {
+    const sorted = [...this.state.services].sort((a, b) => {
+      if (this.state.sort === 'popular') {
+        if (a.popular && !b.popular) return -1;
+        if (!a.popular && b.popular) return 1;
+      }
+      return a.name.localeCompare(b.name);
+    });
+
+    for (const svc of sorted) {
       const chip = document.createElement('div');
       chip.className = `service-chip${this.state.selected.has(svc.id) ? ' active' : ''}`;
       chip.dataset.id = svc.id;
@@ -241,19 +254,13 @@ const App = {
     }
     section.style.display = '';
 
-    const btn = document.getElementById('refresh-btn');
-    if (btn) btn.classList.add('loading');
-
     const ids = [...this.state.selected].join(',');
     try {
       const res = await fetch(`/api/status?ids=${ids}&region=${this.state.region}`);
       this.state.statuses = await res.json();
-      this.state.lastFetch = Date.now();
       this.renderStatusGrid();
     } catch (err) {
       console.error('Failed to fetch status:', err);
-    } finally {
-      if (btn) btn.classList.remove('loading');
     }
   },
 
@@ -321,6 +328,9 @@ const App = {
               <span>${svc.name.charAt(0)}</span>
             </div>
             <span class="status-card-name">${esc(svc.name)}</span>
+            <a class="report-btn" href="https://github.com/NukeMyDay/pingfalcon/issues/new?title=${encodeURIComponent(`Service report: ${svc.name}`)}&body=${encodeURIComponent(`**Service:** ${svc.name}\n**Status:** ${statusKey}\n**Message:** ${description}\n**Status page:** ${svc.statusPageUrl || 'N/A'}\n\n**Issue description:**\n<!-- Please describe the issue here -->`)}" target="_blank" rel="noopener" title="Report an issue">
+              <svg viewBox="0 0 16 16" fill="currentColor" width="13" height="13"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM7 3.5v5a1 1 0 0 0 2 0v-5a1 1 0 0 0-2 0Zm1 8.25a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5Z"/></svg>
+            </a>
           </div>
           <div class="status-indicator">
             <span class="status-dot ${statusKey}"></span>
@@ -365,16 +375,6 @@ const App = {
       grid.appendChild(card);
     }
 
-    this.updateRefreshInfo();
-  },
-
-  updateRefreshInfo() {
-    const el = document.getElementById('refresh-info');
-    if (!this.state.lastFetch) {
-      el.textContent = '';
-      return;
-    }
-    el.textContent = `Last refresh: ${timeAgo(new Date(this.state.lastFetch).toISOString())}`;
   },
 
   startAutoRefresh() {
@@ -383,12 +383,10 @@ const App = {
       if (this.state.selected.size > 0) {
         this.fetchStatuses();
       }
-      this.updateRefreshInfo();
     }, 60000);
 
     // Update "time ago" labels every second
     setInterval(() => {
-      this.updateRefreshInfo();
       document.querySelectorAll('[data-timestamp]').forEach((el) => {
         el.textContent = `Updated ${timeAgo(el.dataset.timestamp)}`;
       });
@@ -522,7 +520,7 @@ function esc(str) {
 function timeAgo(isoString) {
   const diff = Date.now() - new Date(isoString).getTime();
   const seconds = Math.floor(diff / 1000);
-  if (seconds < 10) return 'just now';
+  if (seconds < 2) return 'just now';
   if (seconds < 60) return `${seconds}s ago`;
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return `${minutes}m ago`;
