@@ -163,7 +163,7 @@ async function parseGoogleCloud(service) {
   }
 }
 
-const parsers = { statuspage: parseStatuspage, slack: parseSlack, google_cloud: parseGoogleCloud };
+const parsers = { statuspage: parseStatuspage, slack: parseSlack, google_cloud: parseGoogleCloud, link_only: async () => ({ rawIndicator: 'none', allIncidents: [], status: 'unknown', description: 'No API available', incidents: [] }) };
 
 // --- Main check ---
 

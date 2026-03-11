@@ -488,8 +488,7 @@ const services = [
     category: 'Customer Support',
     color: '#1f73b7',
     statusPageUrl: 'https://status.zendesk.com',
-    apiUrl: 'https://status.zendesk.com/api/v2/status.json',
-    type: 'statuspage',
+    type: 'link_only',
   },
   {
     id: 'intercom',
