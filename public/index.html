@@ -46,11 +46,11 @@
     <section class="section" id="selector-section">
       <div class="section-title-row">
         <h2 class="section-title">Services <span id="service-count" class="service-count"></span></h2>
+        <button id="deselect-all" class="deselect-all-btn" style="display:none">Deselect all</button>
         <div class="sort-toggle">
           <button class="sort-btn active" data-sort="popular">Popular</button>
           <button class="sort-btn" data-sort="alpha">A–Z</button>
         </div>
-        <button id="deselect-all" class="deselect-all-btn" style="display:none">Deselect all</button>
       </div>
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -177,6 +177,15 @@ Content-Type: application/json
       </section>
     </div>
   </main>
+
+  <section class="section changelog-section">
+    <div class="container">
+      <h2 class="section-title">Changelog</h2>
+      <div id="changelog-list" class="changelog-list">
+        <span class="changelog-loading">Loading...</span>
+      </div>
+    </div>
+  </section>
 
   <footer class="footer">
     <div class="container">
