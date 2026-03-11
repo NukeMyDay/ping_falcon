@@ -480,6 +480,8 @@ body {
   border-radius: var(--radius-sm);
   overflow: hidden;
   transition: box-shadow var(--transition);
+  display: flex;
+  flex-direction: column;
 }
 
 .status-card:hover {
@@ -493,6 +495,7 @@ body {
 .status-card:has(.status-dot.unknown)        { border-left: 3px solid var(--status-unknown); }
 
 .status-card-body {
+  flex: 1;
   padding: 18px 18px 14px;
 }
 
