@@ -168,7 +168,8 @@ body {
 .header-inner {
   display: flex;
   align-items: center;
-  gap: 20px;
+  column-gap: 20px;
+  row-gap: 6px;
   flex-wrap: wrap;
 }
 
@@ -179,9 +180,9 @@ body {
 }
 
 .logo-img {
-  height: 32px;
-  width: 32px;
-  border-radius: 7px;
+  height: 80px;
+  width: 80px;
+  border-radius: 14px;
   display: block;
 }
 
@@ -206,8 +207,11 @@ body {
 }
 
 .tagline {
+  order: 10;
+  flex-basis: 100%;
   color: var(--text-secondary);
   font-size: 0.9rem;
+  margin-top: -2px;
 }
 
 /* --- Search --- */
@@ -1118,18 +1122,7 @@ body {
   }
 
   .header-inner {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .header-controls {
-    margin-left: 0;
-    width: 100%;
-  }
-
-  .tagline {
-    display: none;
+    row-gap: 4px;
   }
 }
 

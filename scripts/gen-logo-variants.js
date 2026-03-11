@@ -9,7 +9,9 @@ const withoutBg      = svg.slice(0, firstPathStart) + svg.slice(firstPathEnd);
 
 // ── 1. Transparent logo (for header) ─────────────────────────────────────────
 // Falcon renders in its original purple/lavender palette on any background.
-fs.writeFileSync('C:/Claude/status-pulse/public/logo-transparent.svg', withoutBg);
+// Also strip decorative white (#FEFEFE) fills so they don't show as blobs.
+const withoutWhite = withoutBg.replace(/<path fill="#FEFEFE"[\s\S]*?\/>/g, '');
+fs.writeFileSync('C:/Claude/status-pulse/public/logo-transparent.svg', withoutWhite);
 console.log('✓ logo-transparent.svg written');
 
 // ── 2. Favicon (white falcon on accent-color background) ─────────────────────
