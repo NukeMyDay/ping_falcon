@@ -163,7 +163,31 @@ async function parseGoogleCloud(service) {
   }
 }
 
-const parsers = { statuspage: parseStatuspage, slack: parseSlack, google_cloud: parseGoogleCloud, link_only: async () => ({ rawIndicator: 'none', allIncidents: [], status: 'unknown', description: 'No API available', incidents: [] }) };
+async function parseRss(service) {
+  const res = await fetch(service.apiUrl, { signal: AbortSignal.timeout(15000) });
+  if (!res.ok) return { rawIndicator: 'none', allIncidents: [], status: 'unknown', description: `HTTP ${res.status}`, incidents: [] };
+
+  const xml = await res.text();
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].map((m) => {
+    const title = (m[1].match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || m[1].match(/<title>(.*?)<\/title>/) || [])[1] || '';
+    const link  = (m[1].match(/<link>(.*?)<\/link>/) || [])[1] || '';
+    const pub   = (m[1].match(/<pubDate>(.*?)<\/pubDate>/) || [])[1];
+    return { title, link, pubDate: pub ? new Date(pub) : null };
+  });
+
+  const active = items.filter((i) => i.pubDate > sevenDaysAgo && !/^resolved:/i.test(i.title.trim()));
+
+  if (active.length > 0) {
+    const shaped = active.map((i) => ({ id: i.link, name: i.title, status: 'investigating', url: i.link, updatedAt: i.pubDate?.toISOString() || null, affectedComponents: [] }));
+    return { rawIndicator: 'minor', allIncidents: shaped, status: 'degraded', description: active[0].title, incidents: shaped };
+  }
+
+  return { rawIndicator: 'none', allIncidents: [], status: 'operational', description: 'All Systems Operational', incidents: [] };
+}
+
+const parsers = { statuspage: parseStatuspage, slack: parseSlack, google_cloud: parseGoogleCloud, rss: parseRss, link_only: async () => ({ rawIndicator: 'none', allIncidents: [], status: 'unknown', description: 'No API available', incidents: [] }) };
 
 // --- Main check ---
 

@@ -123,8 +123,8 @@ const services = [
     color: '#003087',
     logoDomain: 'paypal.com',
     statusPageUrl: 'https://www.paypal-status.com',
-    apiUrl: 'https://www.paypal-status.com/api/v2/status.json',
-    type: 'statuspage',
+    apiUrl: 'https://www.paypal-status.com/feed/rss',
+    type: 'rss',
   },
 
   // --- AI ---
