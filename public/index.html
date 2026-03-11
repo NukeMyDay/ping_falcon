@@ -46,10 +46,12 @@
     <section class="section" id="selector-section">
       <div class="section-title-row">
         <h2 class="section-title">Services <span id="service-count" class="service-count"></span></h2>
-        <button id="deselect-all" class="deselect-all-btn" style="display:none">Deselect all</button>
-        <div class="sort-toggle">
-          <button class="sort-btn active" data-sort="popular">Popular</button>
-          <button class="sort-btn" data-sort="alpha">A–Z</button>
+        <div class="title-actions">
+          <button id="deselect-all" class="deselect-all-btn" style="display:none">Deselect all</button>
+          <div class="sort-toggle">
+            <button class="sort-btn active" data-sort="popular">Popular</button>
+            <button class="sort-btn" data-sort="alpha">A–Z</button>
+          </div>
         </div>
       </div>
       <div class="search-wrap">
@@ -84,7 +86,7 @@
     <div class="two-col">
       <!-- Suggestions -->
       <section class="section" id="suggest-section">
-        <h2 class="section-title">Suggest a Tool</h2>
+        <h2 class="section-title">Suggest a Service</h2>
         <form id="suggest-form" class="suggest-form">
           <input
             type="text"
@@ -175,17 +177,14 @@ Content-Type: application/json
 { "secret": "your-secret" }</code></pre></div>
         </div>
       </section>
+      <section class="section changelog-section">
+        <h2 class="section-title">Changelog</h2>
+        <div id="changelog-list" class="changelog-list">
+          <span class="changelog-loading">Loading...</span>
+        </div>
+      </section>
     </div>
   </main>
-
-  <section class="section changelog-section">
-    <div class="container">
-      <h2 class="section-title">Changelog</h2>
-      <div id="changelog-list" class="changelog-list">
-        <span class="changelog-loading">Loading...</span>
-      </div>
-    </div>
-  </section>
 
   <footer class="footer">
     <div class="container">

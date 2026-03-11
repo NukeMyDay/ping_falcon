@@ -117,7 +117,7 @@ body {
   color: var(--text-secondary);
   line-height: 1.6;
   font-weight: 400;
-  vertical-align: middle;
+  vertical-align: 0.1em;
 }
 
 .section-header {
@@ -339,6 +339,13 @@ body {
   margin-bottom: 0;
 }
 
+.title-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .sort-toggle {
   display: flex;
   gap: 2px;
@@ -371,7 +378,6 @@ body {
 }
 
 .deselect-all-btn {
-  margin-left: auto;
   background: none;
   border: none;
   color: var(--text-secondary);
