@@ -9,8 +9,8 @@ const withoutBg      = svg.slice(0, firstPathStart) + svg.slice(firstPathEnd);
 
 // ── 1. Transparent logo (for header) ─────────────────────────────────────────
 // Falcon renders in its original purple/lavender palette on any background.
-// Also strip decorative white (#FEFEFE) fills so they don't show as blobs.
-const withoutWhite = withoutBg.replace(/<path fill="#FEFEFE"[\s\S]*?\/>/g, '');
+// Also strip near-white fills (#FE…, #FA…, #F9…, #F8…) so only the lilac tones remain.
+const withoutWhite = withoutBg.replace(/<path fill="#F[89A-Fa-f][0-9A-Fa-f]{4}"[\s\S]*?\/>/g, '');
 fs.writeFileSync('C:/Claude/status-pulse/public/logo-transparent.svg', withoutWhite);
 console.log('✓ logo-transparent.svg written');
 
