@@ -427,11 +427,17 @@ const App = {
 
   // --- Helpers ---
 
-  getLogoUrl(statusPageUrl) {
+  getLogoUrl(input) {
+    if (!input) return null;
     try {
-      const { hostname } = new URL(statusPageUrl);
-      const parts = hostname.split('.');
-      const domain = parts.length > 2 ? parts.slice(-2).join('.') : hostname;
+      let domain;
+      if (input.includes('://')) {
+        const { hostname } = new URL(input);
+        const parts = hostname.split('.');
+        domain = parts.length > 2 ? parts.slice(-2).join('.') : hostname;
+      } else {
+        domain = input;
+      }
       return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
     } catch {
       return null;
