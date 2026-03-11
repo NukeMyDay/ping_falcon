@@ -32,6 +32,7 @@ const App = {
       await this.fetchStatuses();
     }
     this.fetchSuggestions();
+    this.fetchChangelog();
     this.startAutoRefresh();
   },
 
@@ -375,6 +376,40 @@ const App = {
       grid.appendChild(card);
     }
 
+  },
+
+  // --- Changelog ---
+
+  async fetchChangelog() {
+    const CACHE_KEY = 'pf_changelog';
+    const CACHE_TTL = 5 * 60 * 1000;
+    try {
+      const cached = sessionStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const { ts, data } = JSON.parse(cached);
+        if (Date.now() - ts < CACHE_TTL) { this.renderChangelog(data); return; }
+      }
+      const res = await fetch('https://api.github.com/repos/NukeMyDay/pingfalcon/commits?per_page=5');
+      const data = await res.json();
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
+      this.renderChangelog(data);
+    } catch { /* silently fail */ }
+  },
+
+  renderChangelog(commits) {
+    const el = document.getElementById('changelog-list');
+    if (!el || !Array.isArray(commits)) return;
+    const items = commits.map((c) => {
+      const sha = c.sha.slice(0, 7);
+      const msg = c.commit.message.split('\n')[0].slice(0, 72);
+      const date = timeAgo(c.commit.author.date);
+      return `<div class="changelog-item">
+        <a class="changelog-sha" href="${c.html_url}" target="_blank" rel="noopener">${sha}</a>
+        <span class="changelog-msg">${esc(msg)}</span>
+        <span class="changelog-date">${date}</span>
+      </div>`;
+    }).join('');
+    el.innerHTML = items + `<a class="changelog-all-link" href="https://github.com/NukeMyDay/pingfalcon/commits/master" target="_blank" rel="noopener">View full changelog on GitHub →</a>`;
   },
 
   startAutoRefresh() {
