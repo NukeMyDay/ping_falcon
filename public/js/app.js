@@ -330,7 +330,7 @@ const App = {
             </div>
             <span class="status-card-name">${esc(svc.name)}</span>
             <a class="report-btn" href="https://github.com/NukeMyDay/pingfalcon/issues/new?title=${encodeURIComponent(`Service report: ${svc.name}`)}&body=${encodeURIComponent(`**Service:** ${svc.name}\n**Status:** ${statusKey}\n**Message:** ${description}\n**Status page:** ${svc.statusPageUrl || 'N/A'}\n\n**Issue description:**\n<!-- Please describe the issue here -->`)}" target="_blank" rel="noopener" title="Report an issue">
-              <svg viewBox="0 0 16 16" fill="currentColor" width="13" height="13"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM7 3.5v5a1 1 0 0 0 2 0v-5a1 1 0 0 0-2 0Zm1 8.25a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5Z"/></svg>
+              <svg viewBox="0 0 16 16" fill="currentColor" width="13" height="13"><path d="M14.5 2H2.5a.5.5 0 0 0-.5.5v11a.5.5 0 0 0 1 0V9h11.5a.5.5 0 0 0 .4-.8l-2-2.7 2-2.7a.5.5 0 0 0-.4-.8ZM3 8V3h10.3l-1.6 2.2a.5.5 0 0 0 0 .6L13.3 8H3Z"/></svg>
             </a>
           </div>
           <div class="status-indicator">
