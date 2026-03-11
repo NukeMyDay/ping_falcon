@@ -163,6 +163,34 @@ async function parseGoogleCloud(service) {
   }
 }
 
+async function parseZendesk(service) {
+  const today = new Date().toISOString().split('T')[0];
+  const res = await fetch(`https://status.zendesk.com/api/ssp/incidents.json?as_of_date=${today}`, {
+    signal: AbortSignal.timeout(15000),
+    headers: { Accept: 'application/json' },
+  });
+  if (!res.ok) return { rawIndicator: 'none', allIncidents: [], status: 'unknown', description: `HTTP ${res.status}`, incidents: [] };
+
+  const data = await res.json();
+  const active = (data.data || []).filter((i) => i.attributes.status !== 'resolved');
+
+  if (active.length === 0) {
+    return { rawIndicator: 'none', allIncidents: [], status: 'operational', description: 'All Systems Operational', incidents: [] };
+  }
+
+  const hasOutage    = active.some((i) => i.attributes.outage);
+  const hasMajor     = active.some((i) => i.attributes.impact === 'major');
+  const rawIndicator = hasOutage ? 'critical' : hasMajor ? 'major' : 'minor';
+  const status       = hasOutage ? 'major_outage' : hasMajor ? 'partial_outage' : 'degraded';
+
+  const shaped = active.map((i) => ({
+    id: i.id, name: i.attributes.name, status: i.attributes.status,
+    url: service.statusPageUrl, updatedAt: i.attributes.startedAt, affectedComponents: [],
+  }));
+
+  return { rawIndicator, allIncidents: shaped, status, description: active[0].attributes.name, incidents: shaped };
+}
+
 async function parseRss(service) {
   const res = await fetch(service.apiUrl, { signal: AbortSignal.timeout(15000) });
   if (!res.ok) return { rawIndicator: 'none', allIncidents: [], status: 'unknown', description: `HTTP ${res.status}`, incidents: [] };
@@ -187,7 +215,7 @@ async function parseRss(service) {
   return { rawIndicator: 'none', allIncidents: [], status: 'operational', description: 'All Systems Operational', incidents: [] };
 }
 
-const parsers = { statuspage: parseStatuspage, slack: parseSlack, google_cloud: parseGoogleCloud, rss: parseRss, link_only: async () => ({ rawIndicator: 'none', allIncidents: [], status: 'unknown', description: 'No API available', incidents: [] }) };
+const parsers = { statuspage: parseStatuspage, slack: parseSlack, google_cloud: parseGoogleCloud, zendesk: parseZendesk, rss: parseRss, link_only: async () => ({ rawIndicator: 'none', allIncidents: [], status: 'unknown', description: 'No API available', incidents: [] }) };
 
 // --- Main check ---
 
