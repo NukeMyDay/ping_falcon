@@ -17,7 +17,7 @@ const App = {
     selected: new Set(),
     statuses: {},
     suggestions: [],
-    votedSuggestions: new Set(),
+    votedSuggestions: new Set(JSON.parse(localStorage.getItem('votedSuggestions') || '[]')),
     region: 'eu',
     sort: 'popular',
     showAll: false,
@@ -29,6 +29,7 @@ const App = {
   async init() {
     this.loadFromUrl();
     this.bindEvents();
+    await this.verifyAdminSecret();
     await this.fetchServices();
     if (this.state.selected.size > 0) {
       await this.fetchStatuses();
@@ -36,6 +37,19 @@ const App = {
     this.fetchSuggestions();
     this.fetchChangelog();
     this.startAutoRefresh();
+  },
+
+  async verifyAdminSecret() {
+    const secret = sessionStorage.getItem('adminSecret');
+    if (!secret) return;
+    try {
+      const res = await fetch('/api/admin/ping', {
+        headers: { 'X-Admin-Secret': secret },
+      });
+      if (!res.ok) sessionStorage.removeItem('adminSecret');
+    } catch {
+      sessionStorage.removeItem('adminSecret');
+    }
   },
 
   // --- URL Sync ---
@@ -573,11 +587,15 @@ const App = {
         method: 'POST',
       });
       const data = await res.json();
+      const saveVoted = (id) => {
+        this.state.votedSuggestions.add(id);
+        localStorage.setItem('votedSuggestions', JSON.stringify([...this.state.votedSuggestions]));
+      };
       if (res.ok) {
-        this.state.votedSuggestions.add(suggestionId);
+        saveVoted(suggestionId);
         await this.fetchSuggestions();
       } else if (res.status === 409) {
-        this.state.votedSuggestions.add(suggestionId);
+        saveVoted(suggestionId);
         btn.classList.add('voted');
         btn.textContent = 'Voted';
       }
