@@ -144,6 +144,7 @@ const App = {
   _setupServiceListToggle() {
     const container = document.getElementById('service-list');
     document.getElementById('service-list-toggle')?.remove();
+    document.getElementById('service-list-toggle-bottom')?.remove();
 
     // Clear any previously hidden overflow chips
     container.querySelectorAll('[data-overflow]').forEach((c) => {
@@ -168,28 +169,42 @@ const App = {
       // Hide row 3+ chips
       overflowChips.forEach((c) => { c.dataset.overflow = 'true'; c.style.display = 'none'; });
 
-      const total = chips.length;
-      const btn = document.createElement('button');
-      btn.id = 'service-list-toggle';
-      btn.className = 'service-list-toggle';
+      const makeBtn = (id) => {
+        const b = document.createElement('button');
+        b.id = id;
+        b.className = 'service-list-toggle';
+        return b;
+      };
+
+      const btnTop = makeBtn('service-list-toggle');
+      const btnBottom = makeBtn('service-list-toggle-bottom');
 
       let collapsed = !this.state.showAll;
       if (!collapsed) overflowChips.forEach((c) => { c.style.display = ''; });
+
       const render = () => {
-        btn.textContent = collapsed ? 'Show all' : 'Show less';
+        const label = collapsed ? 'Show all' : 'Show less';
+        btnTop.textContent = label;
+        btnBottom.textContent = label;
       };
       render();
 
-      btn.addEventListener('click', () => {
+      const toggle = () => {
         collapsed = !collapsed;
         this.state.showAll = !collapsed;
         overflowChips.forEach((c) => { c.style.display = collapsed ? 'none' : ''; });
         render();
-      });
+      };
+      btnTop.addEventListener('click', toggle);
+      btnBottom.addEventListener('click', toggle);
 
       const titleActions = document.querySelector('.title-actions');
       const deselectBtn = document.getElementById('deselect-all');
-      titleActions.insertBefore(btn, deselectBtn);
+      titleActions.insertBefore(btnTop, deselectBtn);
+
+      const wrap = document.getElementById('service-list-toggle-wrap');
+      wrap.innerHTML = '';
+      wrap.appendChild(btnBottom);
     });
   },
 
@@ -468,6 +483,8 @@ const App = {
       return;
     }
 
+    const adminSecret = sessionStorage.getItem('adminSecret');
+
     for (const s of this.state.suggestions) {
       const item = document.createElement('div');
       item.className = 'suggestion-item';
@@ -478,12 +495,19 @@ const App = {
         <div class="suggestion-right">
           <span class="vote-count">${s.votes}</span>
           <button class="btn-vote" data-id="${s.id}" title="Upvote">+1</button>
+          ${adminSecret ? `<button class="btn-delete-suggestion" data-id="${s.id}" title="Delete">×</button>` : ''}
         </div>
       `;
 
       item.querySelector('.btn-vote').addEventListener('click', (e) => {
         this.vote(s.id, e.target);
       });
+
+      if (adminSecret) {
+        item.querySelector('.btn-delete-suggestion').addEventListener('click', () => {
+          this.deleteSuggestion(s.id, item, adminSecret);
+        });
+      }
 
       list.appendChild(item);
     }
@@ -523,6 +547,23 @@ const App = {
       msgEl.textContent = '';
       msgEl.className = 'form-hint';
     }, 5000);
+  },
+
+  async deleteSuggestion(id, itemEl, secret) {
+    try {
+      const res = await fetch(`/api/suggestions/${id}`, {
+        method: 'DELETE',
+        headers: { 'X-Admin-Secret': secret },
+      });
+      if (res.ok) {
+        itemEl.remove();
+        this.state.suggestions = this.state.suggestions.filter((s) => s.id !== id);
+      } else {
+        alert('Delete failed. Check your admin secret.');
+      }
+    } catch {
+      alert('Network error.');
+    }
   },
 
   async vote(suggestionId, btn) {

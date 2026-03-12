@@ -254,6 +254,10 @@ body {
   gap: 10px;
 }
 
+#service-list-toggle-wrap {
+  margin-top: 10px;
+}
+
 .service-list-toggle {
   background: none;
   border: none;
@@ -766,6 +770,23 @@ body {
 .btn-vote:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+
+.btn-delete-suggestion {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  opacity: 0.5;
+  transition: opacity var(--transition), color var(--transition);
+}
+
+.btn-delete-suggestion:hover {
+  color: #e05c5c;
+  opacity: 1;
 }
 
 .btn-vote.voted {
