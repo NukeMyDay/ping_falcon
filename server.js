@@ -9,6 +9,9 @@ const { checkAllStatuses } = require('./services/statusChecker');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust reverse proxy (Traefik) so req.ip returns real client IP
+app.set('trust proxy', 1);
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 

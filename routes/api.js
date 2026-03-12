@@ -191,6 +191,15 @@ router.post('/suggestions', suggestionLimiter, (req, res) => {
   });
 });
 
+// GET /api/admin/ping  — verify admin secret
+router.get('/admin/ping', (req, res) => {
+  const adminSecret = process.env.ADMIN_SECRET;
+  if (!adminSecret || req.headers['x-admin-secret'] !== adminSecret) {
+    return res.status(403).json({ error: 'Forbidden.' });
+  }
+  res.json({ ok: true });
+});
+
 // DELETE /api/suggestions/:id  — requires X-Admin-Secret header
 router.delete('/suggestions/:id', (req, res) => {
   const adminSecret = process.env.ADMIN_SECRET;
