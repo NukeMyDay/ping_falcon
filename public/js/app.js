@@ -19,6 +19,7 @@ const App = {
     suggestions: [],
     region: 'eu',
     sort: 'popular',
+    showAll: false,
     refreshTimer: null,
   },
 
@@ -172,7 +173,8 @@ const App = {
       btn.id = 'service-list-toggle';
       btn.className = 'service-list-toggle';
 
-      let collapsed = true;
+      let collapsed = !this.state.showAll;
+      if (!collapsed) overflowChips.forEach((c) => { c.style.display = ''; });
       const render = () => {
         btn.textContent = collapsed ? 'Show all' : 'Show less';
       };
@@ -180,6 +182,7 @@ const App = {
 
       btn.addEventListener('click', () => {
         collapsed = !collapsed;
+        this.state.showAll = !collapsed;
         overflowChips.forEach((c) => { c.style.display = collapsed ? 'none' : ''; });
         render();
       });
