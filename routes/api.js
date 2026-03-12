@@ -191,6 +191,23 @@ router.post('/suggestions', suggestionLimiter, (req, res) => {
   });
 });
 
+// DELETE /api/suggestions/:id  — requires X-Admin-Secret header
+router.delete('/suggestions/:id', (req, res) => {
+  const adminSecret = process.env.ADMIN_SECRET;
+  if (!adminSecret || req.headers['x-admin-secret'] !== adminSecret) {
+    return res.status(403).json({ error: 'Forbidden.' });
+  }
+
+  const { id } = req.params;
+  const db = getDb();
+  const suggestion = db.prepare('SELECT id FROM suggestions WHERE id = ?').get(id);
+  if (!suggestion) return res.status(404).json({ error: 'Suggestion not found.' });
+
+  db.prepare('DELETE FROM suggestion_votes WHERE suggestion_id = ?').run(id);
+  db.prepare('DELETE FROM suggestions WHERE id = ?').run(id);
+  res.json({ message: 'Suggestion deleted.' });
+});
+
 // POST /api/suggestions/:id/vote
 router.post('/suggestions/:id/vote', voteLimiter, (req, res) => {
   const { id } = req.params;
