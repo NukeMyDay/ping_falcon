@@ -545,14 +545,18 @@ const App = {
       this.state.selected.add(existing.id);
       this.updateUrl();
       this.updateDeselectBtn();
-      // Highlight the chip
-      const chip = document.querySelector(`.service-chip[data-id="${existing.id}"]`);
+      // Move chip to first position so it's visible even in collapsed view
+      const container = document.getElementById('service-list');
+      const chip = container.querySelector(`.service-chip[data-id="${existing.id}"]`);
       if (chip) {
         chip.classList.add('active');
-        chip.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        container.prepend(chip);
+        this._setupServiceListToggle();
       }
+      // Immediately fetch status so the monitoring card appears right away
+      this.fetchStatuses();
       nameEl.value = '';
-      msgEl.textContent = `"${existing.name}" ist bereits verfügbar — wurde für dich selektiert.`;
+      msgEl.textContent = 'Service already exists — selected for you.';
       msgEl.className = 'form-hint success';
       setTimeout(() => { msgEl.textContent = ''; msgEl.className = 'form-hint'; }, 5000);
       return;
