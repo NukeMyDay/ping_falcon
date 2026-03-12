@@ -21,12 +21,6 @@ services:
       - traefik.http.routers.pingfalcon.entrypoints=websecure
       - traefik.http.routers.pingfalcon.tls.certresolver=letsencrypt
       - traefik.http.services.pingfalcon.loadbalancer.server.port=3000
-      # HTTP → HTTPS redirect
-      - "traefik.http.routers.pingfalcon-http.rule=Host(`pingfalcon.net`) || Host(`www.pingfalcon.net`)"
-      - traefik.http.routers.pingfalcon-http.entrypoints=web
-      - traefik.http.routers.pingfalcon-http.middlewares=redirect-https
-      - traefik.http.middlewares.redirect-https.redirectscheme.scheme=https
-      - traefik.http.middlewares.redirect-https.redirectscheme.permanent=true
 
 networks:
   traefik-public:
