@@ -2,17 +2,17 @@
 
 **A lightweight, self-hostable status monitor for the tools your business depends on.**
 
-Monitor 100 SaaS services in real time — from payments and e-commerce to communication and infrastructure. Select the services you care about, filter by region, and subscribe to webhook alerts when something breaks.
+Monitor 100 SaaS services in real time. Select the services you care about, filter by region, and subscribe to webhook alerts when something breaks.
 
 ![pingfalcon screenshot](https://pingfalcon.net)
 
 ## Features
 
-- **100 pre-configured services** — Shopify, Stripe, Klaviyo, Slack, GitHub, Cloudflare, OpenAI, Figma, Datadog, and more
+- **100 pre-configured services** — Shopify, Stripe, Slack, GitHub, OpenAI, Cloudflare, and more
 - **Real-time status** — polls official status APIs every 60 seconds
 - **Live timestamps** — "Updated X ago" counts up every second
 - **Region filtering** — EU/DACH, US/Americas, APAC, Global
-- **Webhook API** — receive POST notifications when a service status changes
+- **Webhook API** — receive POST notifications when a service status changes, with automatic retries
 - **Dark/light mode** — auto-detects system preference
 - **Shareable URLs** — selected services are encoded in the URL
 - **Suggest a service** — built-in form to request new integrations
@@ -39,7 +39,7 @@ npm install
 node server.js
 ```
 
-Requires Node.js 18+ and Python/make/g++ for native SQLite compilation.
+Requires Node.js 18+.
 
 ## Configuration
 
@@ -89,6 +89,16 @@ Content-Type: application/json
 }
 ```
 
+Response:
+
+```json
+{
+  "id": 1,
+  "secret": "abc123...",
+  "message": "Webhook registered. Store the secret — you need it to verify payloads and to unsubscribe."
+}
+```
+
 Payload sent on status change:
 
 ```json
@@ -104,34 +114,37 @@ Payload sent on status change:
 
 Verify the signature: `X-Pingfalcon-Signature: HMAC-SHA256(secret, body)`
 
-Unsubscribe: `DELETE /api/webhooks/:id`
+Failed deliveries are retried up to 3 times with increasing delays (1s, 3s, 10s). 5xx errors and network timeouts trigger a retry; 4xx errors do not.
+
+Unsubscribe: `DELETE /api/webhooks/:id` with `{ "secret": "..." }` in the body.
 
 ## Supported Services
 
-| Service | Category |
+| Category | Services |
 |---|---|
-| Shopify, Klaviyo, Recharge, BigCommerce, Squarespace, Webflow | E-Commerce |
-| Stripe, Adyen, Plaid, Chargebee, Braintree | Payments |
-| Claude, OpenAI, Gemini | AI |
-| Slack, Zoom, Discord, Twilio, Webex, RingCentral, Vonage, Telnyx, Pusher, Ably | Communication |
-| Asana, Linear, Jira, Notion, monday.com, Airtable, ClickUp, Trello, Confluence, Coda | Project Management |
-| Figma, Miro, Loom | Design |
-| HubSpot, Braze, ActiveCampaign | CRM |
-| Mailchimp, SendGrid, Mailgun, Brevo, Kit, Customer.io | Email Marketing |
-| Zendesk, Intercom, Gorgias, Help Scout, Drift, LiveChat | Customer Support |
-| GitHub, Cloudflare, DigitalOcean, Linode | Infrastructure |
-| Vercel, Netlify, Render, Fly.io | Hosting |
-| CircleCI, Buildkite | Developer Tools (CI/CD) |
-| Supabase, LaunchDarkly, npm, Snyk, HashiCorp, Algolia, Cloudinary, Stream | Developer Tools |
-| Datadog, New Relic, Sentry, Grafana Cloud | Monitoring |
-| 1Password, Duo Security | Security |
-| Snowflake, Segment, Fivetran, dbt Cloud, Stitch Data, Y42 | Data Platform |
-| Mixpanel, Amplitude, Hotjar, FullStory, Optimizely, Pendo | Analytics |
-| Calendly, Typeform, SurveyMonkey | Scheduling & Forms |
-| Buffer, Hootsuite, Sprout Social | Social Media |
-| Dropbox, Box | Storage |
-| Contentful, Sanity, Ghost | CMS |
-| Twitch | Streaming |
+| AI | Claude, OpenAI, Gemini |
+| Analytics | Mixpanel, Amplitude, Hotjar, FullStory, Optimizely, Pendo |
+| CMS | Contentful, Sanity, Ghost |
+| Communication | Slack, Zoom, Discord, Twilio, Webex, RingCentral, Vonage, Telnyx, Pusher, Ably |
+| CRM | HubSpot, Braze, ActiveCampaign |
+| Customer Support | Zendesk, Intercom, Gorgias, Help Scout, Drift, LiveChat |
+| Data Platform | Snowflake, Segment, Fivetran, dbt Cloud, Stitch Data, Y42 |
+| Design | Figma, Miro, Loom |
+| Developer Tools | CircleCI, Buildkite, Supabase, LaunchDarkly, npm, Snyk, HashiCorp, Algolia, Cloudinary, Stream |
+| E-Commerce | Shopify, Klaviyo, Recharge, BigCommerce, Squarespace, Webflow |
+| Email Marketing | Mailchimp, SendGrid, Mailgun, Brevo, Kit, Customer.io |
+| Forms | Typeform, SurveyMonkey |
+| Hosting | Vercel, Netlify, Render, Fly.io |
+| Infrastructure | GitHub, Cloudflare, DigitalOcean, Linode |
+| Monitoring | Datadog, New Relic, Sentry, Grafana Cloud |
+| Payments | Stripe, Plaid, Chargebee, Braintree, PayPal |
+| Productivity | Notion |
+| Project Management | Asana, Linear, Jira, monday.com, Airtable, ClickUp, Trello, Confluence, Coda |
+| Scheduling | Calendly |
+| Security | 1Password, Duo Security |
+| Social Media | Buffer, Hootsuite, Sprout Social |
+| Storage | Dropbox, Box |
+| Streaming | Twitch |
 
 ## Self-Hosting with Traefik
 
@@ -144,12 +157,10 @@ labels:
   - traefik.http.routers.pingfalcon.entrypoints=websecure
   - traefik.http.routers.pingfalcon.tls.certresolver=letsencrypt
   - traefik.http.services.pingfalcon.loadbalancer.server.port=3000
-  # HTTP → HTTPS redirect
+  # HTTP router — required for ACME HTTP-01 challenge
   - "traefik.http.routers.pingfalcon-http.rule=Host(`yourdomain.com`) || Host(`www.yourdomain.com`)"
   - traefik.http.routers.pingfalcon-http.entrypoints=web
-  - traefik.http.routers.pingfalcon-http.middlewares=redirect-to-https
-  - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
-  - traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true
+  - traefik.http.routers.pingfalcon-http.service=pingfalcon
 ```
 
 ## Tech Stack
@@ -162,7 +173,3 @@ labels:
 ## License
 
 MIT — free to use, modify, and self-host.
-
----
-
-Built by [Florian zu Dreele](mailto:tweet@pingfalcon.net) · [pingfalcon.net](https://pingfalcon.net)
