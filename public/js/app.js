@@ -18,6 +18,7 @@ const App = {
     statuses: {},
     suggestions: [],
     votedSuggestions: new Set(JSON.parse(localStorage.getItem('votedSuggestions') || '[]')),
+    adminVerified: false,
     region: 'eu',
     sort: 'popular',
     showAll: false,
@@ -46,7 +47,11 @@ const App = {
       const res = await fetch('/api/admin/ping', {
         headers: { 'X-Admin-Secret': secret },
       });
-      if (!res.ok) sessionStorage.removeItem('adminSecret');
+      if (res.ok) {
+        this.state.adminVerified = true;
+      } else {
+        sessionStorage.removeItem('adminSecret');
+      }
     } catch {
       sessionStorage.removeItem('adminSecret');
     }
@@ -60,6 +65,7 @@ const App = {
       });
       if (res.ok) {
         sessionStorage.setItem('adminSecret', secret);
+        this.state.adminVerified = true;
         await this.fetchSuggestions();
         console.log('Admin secret accepted. Delete buttons are now visible.');
       } else {
@@ -518,7 +524,8 @@ const App = {
       return;
     }
 
-    const adminSecret = sessionStorage.getItem('adminSecret');
+    const isAdmin = this.state.adminVerified;
+    const adminSecret = isAdmin ? sessionStorage.getItem('adminSecret') : null;
 
     for (const s of this.state.suggestions) {
       const item = document.createElement('div');
@@ -530,7 +537,7 @@ const App = {
         <div class="suggestion-right">
           <span class="vote-count">${s.votes}</span>
           <button class="btn-vote${this.state.votedSuggestions.has(s.id) ? ' voted' : ''}" data-id="${s.id}" title="Upvote">${this.state.votedSuggestions.has(s.id) ? 'Voted' : '+1'}</button>
-          ${adminSecret ? `<button class="btn-delete-suggestion" data-id="${s.id}" title="Delete">×</button>` : ''}
+          ${isAdmin ? `<button class="btn-delete-suggestion" data-id="${s.id}" title="Delete">×</button>` : ''}
         </div>
       `;
 
@@ -538,7 +545,7 @@ const App = {
         this.vote(s.id, e.target);
       });
 
-      if (adminSecret) {
+      if (isAdmin) {
         item.querySelector('.btn-delete-suggestion').addEventListener('click', () => {
           this.deleteSuggestion(s.id, item, adminSecret);
         });
@@ -621,6 +628,7 @@ const App = {
         this.state.suggestions = this.state.suggestions.filter((s) => s.id !== id);
       } else if (res.status === 403) {
         sessionStorage.removeItem('adminSecret');
+        this.state.adminVerified = false;
         await this.fetchSuggestions();
         console.error('Admin secret rejected. Run app.setAdminSecret("your-secret") to re-authenticate.');
       } else {
