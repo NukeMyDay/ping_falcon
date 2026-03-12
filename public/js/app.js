@@ -558,7 +558,7 @@ const App = {
       // Immediately fetch status so the monitoring card appears right away
       this.fetchStatuses();
       nameEl.value = '';
-      msgEl.textContent = 'Service already exists — selected for you.';
+      msgEl.textContent = 'Service already exists.';
       msgEl.className = 'form-hint success';
       setTimeout(() => { msgEl.textContent = ''; msgEl.className = 'form-hint'; }, 5000);
       return;
@@ -695,3 +695,7 @@ document.addEventListener('DOMContentLoaded', () => {
   Theme.init();
   App.init();
 });
+
+// Expose app globally for admin console access:
+// sessionStorage.setItem('adminSecret', '...'); app.fetchSuggestions()
+window.app = App;
