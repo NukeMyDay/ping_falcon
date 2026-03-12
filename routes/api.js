@@ -245,6 +245,32 @@ router.post('/suggestions/:id/vote', voteLimiter, (req, res) => {
   res.json({ id: Number(id), votes: votes.count });
 });
 
+// DELETE /api/suggestions/:id/vote  — remove own vote
+router.delete('/suggestions/:id/vote', voteLimiter, (req, res) => {
+  const { id } = req.params;
+  const ipHash = hashIp(req);
+  const db = getDb();
+
+  const suggestion = db.prepare('SELECT id FROM suggestions WHERE id = ?').get(id);
+  if (!suggestion) {
+    return res.status(404).json({ error: 'Suggestion not found.' });
+  }
+
+  const result = db
+    .prepare('DELETE FROM suggestion_votes WHERE suggestion_id = ? AND ip_hash = ?')
+    .run(id, ipHash);
+
+  if (result.changes === 0) {
+    return res.status(409).json({ error: 'No vote found to remove.' });
+  }
+
+  const votes = db
+    .prepare('SELECT COUNT(*) AS count FROM suggestion_votes WHERE suggestion_id = ?')
+    .get(id);
+
+  res.json({ id: Number(id), votes: votes.count });
+});
+
 // --------------------------------------------------
 // Webhooks
 // --------------------------------------------------

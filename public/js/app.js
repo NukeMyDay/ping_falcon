@@ -52,6 +52,7 @@ const App = {
     }
   },
 
+
   // --- URL Sync ---
 
   loadFromUrl() {
@@ -83,6 +84,7 @@ const App = {
       e.preventDefault();
       this.submitSuggestion();
     });
+
 
     document.getElementById('region-select').addEventListener('change', (e) => {
       this.state.region = e.target.value;
@@ -608,20 +610,23 @@ const App = {
   },
 
   async vote(suggestionId, btn) {
+    const isVoted = this.state.votedSuggestions.has(suggestionId);
     try {
       const res = await fetch(`/api/suggestions/${suggestionId}/vote`, {
-        method: 'POST',
+        method: isVoted ? 'DELETE' : 'POST',
       });
-      const data = await res.json();
-      const saveVoted = (id) => {
-        this.state.votedSuggestions.add(id);
-        localStorage.setItem('votedSuggestions', JSON.stringify([...this.state.votedSuggestions]));
-      };
       if (res.ok) {
-        saveVoted(suggestionId);
+        if (isVoted) {
+          this.state.votedSuggestions.delete(suggestionId);
+        } else {
+          this.state.votedSuggestions.add(suggestionId);
+        }
+        localStorage.setItem('votedSuggestions', JSON.stringify([...this.state.votedSuggestions]));
         await this.fetchSuggestions();
-      } else if (res.status === 409) {
-        saveVoted(suggestionId);
+      } else if (res.status === 409 && !isVoted) {
+        // Already voted server-side — sync local state
+        this.state.votedSuggestions.add(suggestionId);
+        localStorage.setItem('votedSuggestions', JSON.stringify([...this.state.votedSuggestions]));
         btn.classList.add('voted');
         btn.textContent = 'Voted';
       }
