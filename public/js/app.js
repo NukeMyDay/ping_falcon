@@ -292,12 +292,15 @@ const App = {
     });
 
     const toggleBtn = document.getElementById('service-list-toggle');
+    const toggleBtnBottom = document.getElementById('service-list-toggle-bottom');
     if (q) {
       if (toggleBtn) toggleBtn.style.display = 'none';
+      if (toggleBtnBottom) toggleBtnBottom.style.display = 'none';
     } else {
       // Re-hide overflow chips and restore toggle
       container.querySelectorAll('[data-overflow]').forEach((c) => { c.style.display = 'none'; });
       if (toggleBtn) toggleBtn.style.display = '';
+      if (toggleBtnBottom) toggleBtnBottom.style.display = '';
     }
   },
 
