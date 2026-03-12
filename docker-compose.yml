@@ -3,8 +3,8 @@ services:
     build: .
     container_name: pingfalcon
     restart: unless-stopped
-    ports:
-      - "3001:3000"
+    networks:
+      - traefik-public
     volumes:
       - ./data:/app/data
       - ./public:/app/public
@@ -27,3 +27,7 @@ services:
       - traefik.http.routers.pingfalcon-http.middlewares=redirect-https
       - traefik.http.middlewares.redirect-https.redirectscheme.scheme=https
       - traefik.http.middlewares.redirect-https.redirectscheme.permanent=true
+
+networks:
+  traefik-public:
+    external: true
