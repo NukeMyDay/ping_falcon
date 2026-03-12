@@ -17,6 +17,7 @@ const App = {
     selected: new Set(),
     statuses: {},
     suggestions: [],
+    votedSuggestions: new Set(),
     region: 'eu',
     sort: 'popular',
     showAll: false,
@@ -494,7 +495,7 @@ const App = {
         </div>
         <div class="suggestion-right">
           <span class="vote-count">${s.votes}</span>
-          <button class="btn-vote" data-id="${s.id}" title="Upvote">+1</button>
+          <button class="btn-vote${this.state.votedSuggestions.has(s.id) ? ' voted' : ''}" data-id="${s.id}" title="Upvote">${this.state.votedSuggestions.has(s.id) ? 'Voted' : '+1'}</button>
           ${adminSecret ? `<button class="btn-delete-suggestion" data-id="${s.id}" title="Delete">×</button>` : ''}
         </div>
       `;
@@ -573,11 +574,10 @@ const App = {
       });
       const data = await res.json();
       if (res.ok) {
-        btn.classList.add('voted');
-        btn.textContent = 'Voted';
-        const counter = btn.previousElementSibling;
-        if (counter) counter.textContent = data.votes;
+        this.state.votedSuggestions.add(suggestionId);
+        await this.fetchSuggestions();
       } else if (res.status === 409) {
+        this.state.votedSuggestions.add(suggestionId);
         btn.classList.add('voted');
         btn.textContent = 'Voted';
       }
