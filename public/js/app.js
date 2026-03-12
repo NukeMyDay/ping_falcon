@@ -52,6 +52,24 @@ const App = {
     }
   },
 
+  // Console helper: app.setAdminSecret('your-secret')
+  async setAdminSecret(secret) {
+    try {
+      const res = await fetch('/api/admin/ping', {
+        headers: { 'X-Admin-Secret': secret },
+      });
+      if (res.ok) {
+        sessionStorage.setItem('adminSecret', secret);
+        await this.fetchSuggestions();
+        console.log('Admin secret accepted. Delete buttons are now visible.');
+      } else {
+        console.error('Invalid admin secret — not saved.');
+      }
+    } catch {
+      console.error('Network error while verifying admin secret.');
+    }
+  },
+
 
   // --- URL Sync ---
 
@@ -601,8 +619,12 @@ const App = {
       if (res.ok) {
         itemEl.remove();
         this.state.suggestions = this.state.suggestions.filter((s) => s.id !== id);
+      } else if (res.status === 403) {
+        sessionStorage.removeItem('adminSecret');
+        await this.fetchSuggestions();
+        console.error('Admin secret rejected. Run app.setAdminSecret("your-secret") to re-authenticate.');
       } else {
-        alert('Delete failed. Check your admin secret.');
+        console.error('Delete failed:', res.status);
       }
     } catch {
       alert('Network error.');
