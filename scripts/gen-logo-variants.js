@@ -11,7 +11,12 @@ const withoutBg      = svg.slice(0, firstPathStart) + svg.slice(firstPathEnd);
 // Falcon renders in its original purple/lavender palette on any background.
 // Also strip near-white fills (#FE…, #FA…, #F9…, #F8…) so only the lilac tones remain.
 const withoutWhite = withoutBg.replace(/<path fill="#F[89A-Fa-f][0-9A-Fa-f]{4}"[\s\S]*?\/>/g, '');
-fs.writeFileSync('C:/Claude/status-pulse/public/logo-transparent.svg', withoutWhite);
+// Crop viewBox to actual falcon content (x:74-952, y:266-734) + 30px padding each side
+const croppedTransparent = withoutWhite.replace(
+  /viewBox="0 0 1024 1024"/,
+  'viewBox="44 236 938 528"'
+);
+fs.writeFileSync('C:/Claude/status-pulse/public/logo-transparent.svg', croppedTransparent);
 console.log('✓ logo-transparent.svg written');
 
 // ── 2. Favicon (white falcon on accent-color background) ─────────────────────
