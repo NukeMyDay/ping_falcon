@@ -180,9 +180,9 @@ body {
 }
 
 .logo-img {
-  height: 80px;
-  width: 80px;
-  border-radius: 14px;
+  height: 50px;
+  width: auto;
+  border-radius: 0;
   display: block;
 }
 
@@ -207,11 +207,9 @@ body {
 }
 
 .tagline {
-  order: 10;
-  flex-basis: 100%;
   color: var(--text-secondary);
   font-size: 0.9rem;
-  margin-top: -2px;
+  align-self: center;
 }
 
 /* --- Search --- */
@@ -1080,10 +1078,11 @@ body {
   background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 6px 12px;
+  padding: 0 12px;
+  height: 32px;
   cursor: pointer;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+  font-size: 0.83rem;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1112,6 +1111,36 @@ body {
 
 /* --- Responsive --- */
 
+/* ≤720px: controls wrap to new row, left-aligned; tagline stays with title */
+@media (max-width: 720px) {
+  .header-controls {
+    flex-basis: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
+    margin-top: 26px;
+  }
+}
+
+/* ≤500px: tagline also wraps under logo+title; extra spacing before controls */
+@media (max-width: 500px) {
+  .tagline {
+    flex-basis: 100%;
+  }
+
+  .logo {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .logo-img {
+    order: 1;
+  }
+
+  .header-controls {
+    margin-top: 26px;
+  }
+}
+
 @media (max-width: 600px) {
   .service-grid {
     grid-template-columns: 1fr 1fr;
@@ -1119,23 +1148,6 @@ body {
 
   .status-grid {
     grid-template-columns: 1fr;
-  }
-
-  .header-inner {
-    flex-direction: column;
-    align-items: stretch;
-    row-gap: 2px;
-  }
-
-  .tagline {
-    order: 0;
-    margin-top: 2px;
-  }
-
-  .header-controls {
-    justify-content: flex-end;
-    margin-left: 0;
-    margin-top: 6px;
   }
 }
 
