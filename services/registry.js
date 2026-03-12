@@ -27,9 +27,8 @@ const services = [
     category: 'E-Commerce',
     popular: true,
     color: '#96bf48',
-    statusPageUrl: 'https://status.shopify.com',
-    apiUrl: 'https://status.shopify.com/api/v2/status.json',
-    type: 'statuspage',
+    statusPageUrl: 'https://shopstatus.shopifyapps.com',
+    type: 'link_only',
   },
   {
     id: 'klaviyo',
