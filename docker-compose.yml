@@ -21,6 +21,11 @@ services:
       - traefik.http.routers.pingfalcon.entrypoints=websecure
       - traefik.http.routers.pingfalcon.tls.certresolver=letsencrypt
       - traefik.http.services.pingfalcon.loadbalancer.server.port=3000
+      # HTTP router — needed so Traefik activates the ACME HTTP-01 challenge handler for this domain.
+      # No redirect middleware here; Hostinger's global entrypoint redirect handles HTTP→HTTPS.
+      - "traefik.http.routers.pingfalcon-http.rule=Host(`pingfalcon.net`) || Host(`www.pingfalcon.net`)"
+      - traefik.http.routers.pingfalcon-http.entrypoints=web
+      - traefik.http.routers.pingfalcon-http.service=pingfalcon
 
 networks:
   traefik-public:
