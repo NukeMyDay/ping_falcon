@@ -536,6 +536,28 @@ const App = {
 
     if (!name) return;
 
+    // Check if the name matches an already-monitored service
+    const normalized = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const existing = this.state.services.find(
+      (s) => s.name.toLowerCase().replace(/[^a-z0-9]/g, '') === normalized
+    );
+    if (existing) {
+      this.state.selected.add(existing.id);
+      this.updateUrl();
+      this.updateDeselectBtn();
+      // Highlight the chip
+      const chip = document.querySelector(`.service-chip[data-id="${existing.id}"]`);
+      if (chip) {
+        chip.classList.add('active');
+        chip.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      nameEl.value = '';
+      msgEl.textContent = `"${existing.name}" ist bereits verfügbar — wurde für dich selektiert.`;
+      msgEl.className = 'form-hint success';
+      setTimeout(() => { msgEl.textContent = ''; msgEl.className = 'form-hint'; }, 5000);
+      return;
+    }
+
     try {
       const res = await fetch('/api/suggestions', {
         method: 'POST',
